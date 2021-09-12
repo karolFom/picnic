@@ -1,5 +1,16 @@
 import requests
-
+'''
+Мои предположения по рефакторингу данного файла:
+1. WEATHER_API_KEY вынести в отдельный файл, который будет хранить статические параметры,
+либо перенести ключ в метод __init__
+2. Оставить всего лишь один метод get_weather_url, например в классе GetWeatherRequest()
+А класс CheckCityExisting наследовать от класса GetWeatherRequest, таким образом можно будет 
+использовать уже существующий метод, и избавиться от лишней инциализации сессии
+3. В методе get_weather_url изменить формирование ссылки, например следующим образом:
+url = f'https://api.openweathermap.org/data/2.5/weather?units=metric&q={city}&appid={WEATHER_API_KEY}'
+4. Также, при использовании наследованного класса, оставить только первый метод send_request,
+из класса GetWeatherRequest. 
+'''
 
 WEATHER_API_KEY = '99ba78ee79a2a24bc507362c5288a81b'
 
