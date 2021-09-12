@@ -37,12 +37,17 @@ def cities_list(q: str = Query(description="Название города", defa
     return [{'id': city.id, 'name': city.name, 'weather': city.weather} for city in cities]
 
 
-@app.post('/users-list/', summary='')
-def users_list():
+@app.get('/users-list/', summary='')
+def users_list(min_age: int = Query(description="Минимальный возраст пользователя", default=None),
+               max_age: int = Query(description="Максимальный возраст пользователя", default=None)):
     """
     Список пользователей
     """
     users = Session().query(User).all()
+    if min_age:
+        users = Session().query(User).filter(User.age >= min_age)
+    if max_age:
+        users = Session().query(User).filter(User.age <= max_age)
     return [{
         'id': user.id,
         'name': user.name,
