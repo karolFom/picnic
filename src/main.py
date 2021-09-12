@@ -37,17 +37,17 @@ def cities_list(q: str = Query(description="Название города", defa
     return [{'id': city.id, 'name': city.name, 'weather': city.weather} for city in cities]
 
 
-@app.get('/users-list/', summary='')
+@app.get('/get-users/', summary='Get Users')
 def users_list(min_age: int = Query(description="Минимальный возраст пользователя", default=None),
                max_age: int = Query(description="Максимальный возраст пользователя", default=None)):
     """
     Список пользователей
     """
-    users = Session().query(User).all()
+    users = Session().query(User)
     if min_age:
-        users = Session().query(User).filter(User.age >= min_age)
+        users = users.filter(User.age >= min_age)
     if max_age:
-        users = Session().query(User).filter(User.age <= max_age)
+        users = users.filter(User.age <= max_age)
     return [{
         'id': user.id,
         'name': user.name,
@@ -56,8 +56,8 @@ def users_list(min_age: int = Query(description="Минимальный возр
     } for user in users]
 
 
-@app.post('/register-user/', summary='CreateUser', response_model=UserModel)
-def register_user(user: RegisterUserRequest):
+@app.post('/create-user/', summary='Create User', response_model=UserModel)
+def create_user(user: RegisterUserRequest):
     """
     Регистрация пользователя
     """
@@ -69,7 +69,7 @@ def register_user(user: RegisterUserRequest):
     return UserModel.from_orm(user_object)
 
 
-@app.get('/all-picnics/', summary='All Picnics', tags=['picnic'])
+@app.get('/get-picnics/', summary='Get All Picnics', tags=['picnic'])
 def all_picnics(datetime: dt.datetime = Query(default=None, description='Время пикника (по умолчанию не задано)'),
                 past: bool = Query(default=True, description='Включая уже прошедшие пикники')):
     """
@@ -96,7 +96,7 @@ def all_picnics(datetime: dt.datetime = Query(default=None, description='Вре�
     } for pic in picnics]
 
 
-@app.post('/picnic-add/', summary='Picnic Add', tags=['picnic'])
+@app.post('/create-picnic/', summary='Create Picnic', tags=['picnic'])
 def picnic_add(city_id: int = None, datetime: dt.datetime = None):
     p = Picnic(city_id=city_id, time=datetime)
     s = Session()
@@ -105,12 +105,12 @@ def picnic_add(city_id: int = None, datetime: dt.datetime = None):
 
     return {
         'id': p.id,
-        'city': Session().query(City).filter(City.id == p.id).first().name,
+        'city': Session().query(City).filter(City.id == p.city_id).first().name,
         'time': p.time,
     }
 
 
-@app.post('/picnic-register/', summary='Picnic Registration', tags=['picnic'])
+@app.post('/register-user-to-picnic/', summary='Register User To Picnic', tags=['picnic'])
 def register_to_picnic(user_id: int, picnic_id: int):
     """
     Регистрация пользователя на пикник
