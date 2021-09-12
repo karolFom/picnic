@@ -110,12 +110,20 @@ def picnic_add(city_id: int = None, datetime: dt.datetime = None):
     }
 
 
-@app.get('/picnic-register/', summary='Picnic Registration', tags=['picnic'])
-def register_to_picnic(*_, **__,):
+@app.post('/picnic-register/', summary='Picnic Registration', tags=['picnic'])
+def register_to_picnic(user_id: int, picnic_id: int):
     """
     Регистрация пользователя на пикник
     (Этот эндпойнт необходимо реализовать в процессе выполнения тестового задания)
     """
-    # TODO: Сделать логику
-    return ...
+    registered_to_picnic = PicnicRegistration(user_id=user_id, picnic_id=picnic_id)
+    s = Session()
+    s.add(registered_to_picnic)
+    s.commit()
+
+    return {
+        'id': registered_to_picnic.id,
+        'user': Session().query(User).filter(User.id == registered_to_picnic.id).first().name,
+        'picnic_id': registered_to_picnic.picnic_id
+    }
 
