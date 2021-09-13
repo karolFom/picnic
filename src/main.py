@@ -7,13 +7,14 @@ from models import RegisterUserRequest, UserModel
 app = FastAPI()
 
 
-@app.post('/create-city/', summary='Create City', description='Создание города по его названию')
+@app.post('/create-city/', summary='Create City', description='Создание города по его названию',
+          tags=['city'])
 def create_city(city: str = Query(description="Название города", default=None)):
     if city is None:
         raise HTTPException(status_code=400, detail='Параметр city должен быть указан')
     check = CheckCityExisting()
     if not check.check_existing(city):
-        raise HTTPException(status_code=400, detail='Параметр city должен быть существующим городом')
+        raise HTTPException(status_code=404, detail='Параметр city должен быть существующим городом')
 
     city_object = Session().query(City).filter(City.name == city.capitalize()).first()
     if city_object is None:
@@ -25,7 +26,7 @@ def create_city(city: str = Query(description="Название города", d
     return {'id': city_object.id, 'name': city_object.name, 'weather': city_object.weather}
 
 
-@app.get('/get-cities/', summary='Get Cities')
+@app.get('/get-cities/', summary='Get Cities', tags=['city'])
 def cities_list(q: str = Query(description="Название города", default=None)):
     """
     Получение списка городов
@@ -37,7 +38,7 @@ def cities_list(q: str = Query(description="Название города", defa
     return [{'id': city.id, 'name': city.name, 'weather': city.weather} for city in cities]
 
 
-@app.get('/get-users/', summary='Get Users')
+@app.get('/get-users/', summary='Get Users', tags=['user'])
 def users_list(min_age: int = Query(description="Минимальный возраст пользователя", default=None),
                max_age: int = Query(description="Максимальный возраст пользователя", default=None)):
     """
@@ -56,7 +57,7 @@ def users_list(min_age: int = Query(description="Минимальный возр
     } for user in users]
 
 
-@app.post('/create-user/', summary='Create User', response_model=UserModel)
+@app.post('/create-user/', summary='Create User', response_model=UserModel, tags=['user'])
 def create_user(user: RegisterUserRequest):
     """
     Регистрация пользователя
