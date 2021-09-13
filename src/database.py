@@ -5,7 +5,8 @@ from external_requests import GetWeatherRequest
 
 # Создание сессии
 SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
-engine = create_engine(SQLALCHEMY_DATABASE_URI)
+POSTGRESQL_DATABASE_URL = 'postgresql://postgres:password@postgres:5432/testcrt'
+engine = create_engine(POSTGRESQL_DATABASE_URL)
 Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Подключение базы (с автоматической генерацией моделей)
